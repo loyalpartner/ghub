@@ -704,11 +704,11 @@ and call `auth-source-forget+'."
       (cl-ecase forge
         ((nil gitea gogs bitbucket)
          (cons "Authorization" (ghub--basic-auth host username)))
-        ((github gitlab)
+        ((github gitlab gitee)
          (error "%s does not support basic authentication"
                 (capitalize (symbol-name forge)))))
     (cons (cl-ecase forge
-            ((nil github gitea gogs bitbucket)
+            ((nil github gitea gogs gitee bitbucket)
              "Authorization")
             (gitlab
              "Private-Token"))
@@ -773,6 +773,9 @@ or (info \"(ghub)Getting Started\") for instructions.
     (gitlab
      (or (ignore-errors (car (process-lines "git" "config" "gitlab.host")))
          (bound-and-true-p glab-default-host)))
+    (gitee
+     (or (ignore-errors (car (process-lines "git" "config" "gitee.host")))
+         (bound-and-true-p gitee-default-host)))
     (gitea
      (or (ignore-errors (car (process-lines "git" "config" "gitea.host")))
          (bound-and-true-p gtea-default-host)))
@@ -798,6 +801,10 @@ or (info \"(ghub)Getting Started\") for instructions.
             (if (equal host "api.bitbucket.org/2.0")
                 "bitbucket.user"
               (format "bitbucket.%s.user" host)))
+           (gitee
+            (if (equal host "gitee.org/api/v5")
+                "gitee.user"
+              (format "gitee.%s.user" host)))
            (gitea
             (when (zerop (call-process "git" nil nil nil "config" "gitea.host"))
               (error "gitea.host is set but always ignored"))
